@@ -1,0 +1,33 @@
+version: '3.1'
+services:
+    web:
+        image: 'nginx:latest'
+        container_name: web
+        volumes:
+            - './:/var/www'
+            - './_docker/web/conf.d/:/etc/nginx/conf.d/'
+        ports:
+            - '8080:80'
+        depends_on:
+            - app
+    app:
+        container_name: app
+        volumes:
+            - './:/var/www'
+        ports:
+            - '9000:9000'
+        build:
+            context: .
+            dockerfile: _docker/app/Dockerfile
+    db:
+        image: postgres
+        restart: always
+        environment:
+            POSTGRES_DB: "db"
+            POSTGRES_USER: "app"
+            POSTGRES_PASSWORD: "app"
+            PGDATA: /var/lib/postgresql/data
+        ports:
+            - "5432:5432"
+        volumes:
+            - './_docker/db/data:/var/lib/postgresql/data'
